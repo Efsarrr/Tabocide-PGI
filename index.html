@@ -8,12 +8,14 @@
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 30px;
-  background-image: url('https://github.com/Efsarrr/Tabocide-PGI/blob/main/IMG-20250630-WA0070.jpg');
+  body {
+  background-image: url('https://raw.githubusercontent.com/Efsarrr/Tabocide-PGI/main/background.jpg');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
   background-attachment: fixed;
-      }
+  background-repeat: no-repeat;
+  color: #000;
+}
     }
     h1 {
       font-size: 28px;
@@ -35,10 +37,18 @@
     .qr-code {
       margin-top: 30px;
     }
-    @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
   body {
-    background-color: #121212;
-    color: #e0e0e0;
+    background-image: url('https://raw.githubusercontent.com/Efsarrr/Tabocide-PGI/main/background.jpg');
+    background-color: transparent;
+    color: #fff;
+  }
+
+  .button {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+  }
+}
   }
 
   .button {
