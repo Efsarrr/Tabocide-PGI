@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabocide PGI — Pusat Gadai Indonesia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dim: rgba(201,168,76,0.15);
+      --navy: #0B1826;
+      --navy-mid: #112236;
+      --navy-light: #1A3450;
+      --white: #F7F4EF;
+      --muted: #8A9BB0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise + gradient bg ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 80% at 90% 80%, rgba(17,34,54,0.9) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* thin top border */
+    body::after {
+      content: '';
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+      z-index: 100;
+    }
+
+    .container {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 520px;
+      padding: 56px 28px 64px;
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+    }
+
+    /* ── Logo / Brand ── */
+    .brand {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      margin-bottom: 40px;
+      animation: fadeDown .6s ease both;
+    }
+
+    .brand-badge {
+      width: 68px; height: 68px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+      border: 1.5px solid rgba(201,168,76,0.35);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,168,76,0.2);
+      font-size: 32px;
+    }
+
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px; font-weight: 700;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+      margin: 0 0 32px;
+      animation: fadeIn .8s .2s ease both;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px; align-self: flex-start;
+      animation: fadeIn .8s .3s ease both;
+    }
+
+    /* ── Nav Links ── */
+    .nav-links {
+      width: 100%; display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 36px;
+      animation: fadeUp .7s .3s ease both;
+    }
+
+    .nav-link {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px;
+      background: rgba(17,34,54,0.6);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 12px;
+      text-decoration: none; color: var(--white);
+      font-size: 14px; font-weight: 500;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(8px);
+      transition: all .25s ease;
+      position: relative; overflow: hidden;
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,0.06), transparent);
+      opacity: 0; transition: opacity .25s;
+    }
+
+    .nav-link:hover {
+      border-color: rgba(201,168,76,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(201,168,76,0.2);
+    }
+    .nav-link:hover::before { opacity: 1; }
+
+    .nav-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+
+    .nav-link-text { flex: 1; }
+    .nav-link-title { display: block; }
+    .nav-link-desc { display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+
+    .nav-arrow {
+      color: var(--gold); font-size: 16px; opacity: 0.6;
+      transition: transform .25s, opacity .25s;
+    }
+    .nav-link:hover .nav-arrow { transform: translateX(3px); opacity: 1; }
+
+    /* ── QR Section ── */
+    .qr-section {
+      width: 100%;
+      background: rgba(17,34,54,0.5);
+      border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 20px;
+      padding: 36px 24px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+      backdrop-filter: blur(10px);
+      margin-bottom: 36px;
+      animation: fadeUp .7s .5s ease both;
+      position: relative; overflow: hidden;
+    }
+
+    /* subtle glow behind QR */
+    .qr-section::before {
+      content: '';
+      position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .qr-label {
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 20px; text-align: center;
+    }
+
+    /* Gold frame wrapper */
+    .qr-frame {
+      position: relative;
+      padding: 10px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
+      box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 12px 40px rgba(201,168,76,0.25), 0 4px 16px rgba(0,0,0,0.4);
+      margin-bottom: 22px;
+    }
+
+    .qr-inner {
+      background: #fff;
+      border-radius: 8px;
+      width: 148px; height: 148px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .qr-inner img { width: 100%; height: 100%; display: block; }
+
+    /* corner decorations */
+    .qr-frame::before, .qr-frame::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-color: var(--navy);
+      border-style: solid;
+      border-radius: 3px;
+    }
+    .qr-frame::before { top: 4px; left: 4px; border-width: 3px 0 0 3px; }
+    .qr-frame::after  { bottom: 4px; right: 4px; border-width: 0 3px 3px 0; }
+
+    .qr-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 600; line-height: 1.3;
+      text-align: center; margin-bottom: 8px;
+    }
+    .qr-desc { font-size: 12px; color: var(--muted); line-height: 1.5; text-align: center; }
+
+    /* ── CTA buttons ── */
+    .cta-row {
+      display: flex; gap: 10px; width: 100%;
+      animation: fadeUp .7s .6s ease both;
+    }
+
+    .btn {
+      flex: 1; padding: 14px 16px;
+      border-radius: 10px; border: none; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: 0.04em;
+      transition: all .25s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(201,168,76,0.45);
+    }
+
+    .btn-secondary {
+      background: rgba(17,34,54,0.7);
+      color: var(--white);
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+    .btn-secondary:hover {
+      border-color: rgba(201,168,76,0.5);
+      background: rgba(201,168,76,0.08);
+      transform: translateY(-2px);
+    }
+
+    /* ── DateTime ── */
+    .datetime-bar {
+      width: 100%;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 16px;
+      background: rgba(17,34,54,0.4);
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 10px;
+      margin-bottom: 28px;
+      backdrop-filter: blur(8px);
+      animation: fadeIn .8s .15s ease both;
+    }
+
+    .datetime-left { display: flex; flex-direction: column; gap: 2px; }
+
+    .datetime-day {
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold); font-weight: 500;
+    }
+    .datetime-date {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 600; color: var(--white);
+    }
+
+    .datetime-time {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 22px; font-weight: 300;
+      color: var(--white); letter-spacing: 0.06em;
+    }
+    .datetime-time span { color: var(--gold); animation: blink 1s step-start infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 40px; text-align: center;
+      font-size: 11px; color: var(--muted); letter-spacing: 0.05em;
+      animation: fadeIn 1s .7s ease both;
+    }
+    .footer span { color: var(--gold); }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-badge">🦁</div>
+      <div class="brand-title">Tabocide PGI</div>
+      <div class="brand-sub">Pusat Gadai Indonesia</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- DateTime Bar -->
+    <div class="datetime-bar">
+      <div class="datetime-left">
+        <div class="datetime-day" id="dt-day"></div>
+        <div class="datetime-date" id="dt-date"></div>
+      </div>
+      <div class="datetime-time" id="dt-time"></div>
+    </div>
+
+    <!-- Nav Links -->
+    <p class="section-label">Layanan Utama</p>
+    <div class="nav-links">
+
+      <a href="https://gadai.pugindo.com/dashboard" target="_blank" class="nav-link">
+        <div class="nav-icon">🌐</div>
+        <div class="nav-link-text">
+          <span class="nav-link-title">PUGINDO</span>
+          <span class="nav-link-desc">Portal Utama Gadai Indonesia</span>
+        </div>
+        <span class="nav-arrow">›</span>
+      </a>
+
+      <a href="https://www.imei.info/id/" target="_blank" class="nav-link">
+        <div class="nav-icon">📱</div>
+        <div class="nav-link-text">
+          <span class="nav-link-title">IMEI Check</span>
+          <span class="nav-link-desc">Verifikasi nomor IMEI perangkat</span>
+        </div>
+        <span class="nav-arrow">›</span>
+      </a>
+
+      <a href="https://www.tiktok.com/@lexy6893?is_from_webapp=1&sender_device=pc" target="_blank" class="nav-link">
+        <div class="nav-icon">🎵</div>
+        <div class="nav-link-text">
+          <span class="nav-link-title">Follow TikTok</span>
+          <span class="nav-link-desc">Update konten terbaru kami</span>
+        </div>
+        <span class="nav-arrow">›</span>
+      </a>
+
+      <a href="https://survey.pusatgadai.id/?cabang=CMS006#step-1" target="_blank" class="nav-link" style="border-color: rgba(201,168,76,0.3);">
+        <div class="nav-icon" style="background: rgba(201,168,76,0.2);">📌</div>
+        <div class="nav-link-text">
+          <span class="nav-link-title">SURVEY</span>
+          <span class="nav-link-desc">Berikan penilaian layanan kami</span>
+        </div>
+        <span class="nav-arrow" style="opacity:1;">›</span>
+      </a>
+
+    </div>
+
+    <!-- QR Section -->
+    <div class="qr-section">
+      <div class="qr-label">📲 &nbsp;Scan untuk Akses Langsung</div>
+      <div class="qr-frame">
+        <div class="qr-inner">
+          <img
+            src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://survey.pusatgadai.id/?cabang=CMS006%23step-1"
+            alt="QR Code Survey Kepuasan"
+          />
+        </div>
+      </div>
+      <div class="qr-title">Survei Kepuasan Pelanggan</div>
+      <div class="qr-desc">Scan QR di atas untuk mengakses formulir survei unit CMS006</div>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="window.open('https://survey.pusatgadai.id/?cabang=CMS006#step-1','_blank')">Akses Langsung</button>
+      <button class="btn btn-secondary" onclick="window.open('https://gadai.pugindo.com/gadai/simulasi','_blank')">Simulasi / Input</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      &copy; 2026 <span>Tabocide PGI</span> · Pusat Gadai Indonesia
+    </div>
+
+  </div>
+  <script>
+    const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+    function updateTime() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2,'0');
+      const m = String(now.getMinutes()).padStart(2,'0');
+      const s = String(now.getSeconds()).padStart(2,'0');
+      document.getElementById('dt-day').textContent = days[now.getDay()];
+      document.getElementById('dt-date').textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      document.getElementById('dt-time').innerHTML = `${h}<span>:</span>${m}<span>:</span>${s}`;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+</body>
+</html>
