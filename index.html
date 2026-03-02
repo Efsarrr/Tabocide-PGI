@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tabocide PGI — Pusat Gadai Indonesia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dim: rgba(201,168,76,0.15);
+      --navy: #0B1826;
+      --navy-mid: #112236;
+      --navy-light: #1A3450;
+      --white: #F7F4EF;
+      --muted: #8A9BB0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.1) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 90% 90%, rgba(17,34,54,0.8) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+      z-index: 200;
+    }
+
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn   { from{opacity:0}to{opacity:1} }
+    @keyframes blink    { 50%{opacity:0} }
+
+    /* ── Shared components ── */
+    .nav-link {
+      display:flex; align-items:center; gap:14px;
+      background:rgba(17,34,54,0.6);
+      border:1px solid rgba(201,168,76,0.15); border-radius:12px;
+      text-decoration:none; color:var(--white);
+      font-size:14px; font-weight:500;
+      backdrop-filter:blur(8px); transition:all .25s ease;
+      position:relative; overflow:hidden;
+    }
+    .nav-link::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.07),transparent);opacity:0;transition:opacity .25s;}
+    .nav-link:hover{border-color:rgba(201,168,76,0.5);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+    .nav-link:hover::before{opacity:1;}
+    .nav-icon{width:38px;height:38px;border-radius:10px;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .nav-link-text{flex:1;}
+    .nav-link-title{display:block;font-weight:600;}
+    .nav-link-desc{display:block;font-size:11px;color:var(--muted);margin-top:2px;}
+    .nav-arrow{color:var(--gold);font-size:18px;opacity:0.6;transition:transform .25s,opacity .25s;}
+    .nav-link:hover .nav-arrow{transform:translateX(3px);opacity:1;}
+
+    .qr-frame{position:relative;padding:10px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold-light),var(--gold));box-shadow:0 0 0 1px rgba(201,168,76,0.3),0 12px 40px rgba(201,168,76,0.2),0 4px 16px rgba(0,0,0,0.4);}
+    .qr-frame::before,.qr-frame::after{content:'';position:absolute;width:16px;height:16px;border-color:var(--navy);border-style:solid;border-radius:3px;}
+    .qr-frame::before{top:4px;left:4px;border-width:3px 0 0 3px;}
+    .qr-frame::after{bottom:4px;right:4px;border-width:0 3px 3px 0;}
+    .qr-inner{background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .qr-inner img{width:100%;height:100%;display:block;}
+
+    .btn{padding:13px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;transition:all .25s ease;}
+    .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);box-shadow:0 4px 20px rgba(201,168,76,0.3);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,168,76,0.45);}
+    .btn-secondary{background:rgba(17,34,54,0.7);color:var(--white);border:1px solid rgba(201,168,76,0.2);}
+    .btn-secondary:hover{border-color:rgba(201,168,76,0.5);background:rgba(201,168,76,0.08);transform:translateY(-2px);}
+
+    /* =============== MOBILE (default) =============== */
+    .pc-layout { display: none; }
+
+    .mobile-layout {
+      display:flex; flex-direction:column; align-items:center;
+      width:100%; max-width:520px; margin:0 auto;
+      padding:52px 22px 60px;
+      position:relative; z-index:1;
+    }
+
+    .m-brand{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:36px;animation:fadeDown .6s ease both;}
+    .m-brand-badge{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--navy-mid),var(--navy-light));border:1.5px solid rgba(201,168,76,0.35);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(201,168,76,0.2);font-size:30px;}
+    .m-brand-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .m-brand-sub{font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+
+    .m-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent);margin:0 0 28px;}
+
+    .m-datetime{width:100%;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(17,34,54,0.4);border:1px solid rgba(201,168,76,0.12);border-radius:10px;margin-bottom:24px;backdrop-filter:blur(8px);animation:fadeIn .8s .15s ease both;}
+    .m-dt-left{display:flex;flex-direction:column;gap:2px;}
+    .m-dt-day{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+    .m-dt-date{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;}
+    .m-dt-time{font-size:20px;font-weight:300;letter-spacing:0.06em;}
+    .m-dt-time span{color:var(--gold);animation:blink 1s step-start infinite;}
+
+    .m-section-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;align-self:flex-start;}
+    .m-nav-links{width:100%;display:flex;flex-direction:column;gap:9px;margin-bottom:28px;animation:fadeUp .7s .3s ease both;}
+    .m-nav-links .nav-link{padding:14px 18px;}
+
+    .m-qr-section{width:100%;background:rgba(17,34,54,0.5);border:1px solid rgba(201,168,76,0.18);border-radius:20px;padding:30px 20px 26px;display:flex;flex-direction:column;align-items:center;backdrop-filter:blur(10px);margin-bottom:28px;animation:fadeUp .7s .5s ease both;position:relative;overflow:hidden;}
+    .m-qr-section::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(201,168,76,0.1) 0%,transparent 70%);pointer-events:none;}
+    .m-qr-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;}
+    .m-qr-section .qr-inner{width:140px;height:140px;}
+    .m-qr-section .qr-frame{margin-bottom:20px;}
+    .m-qr-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;text-align:center;margin-bottom:6px;}
+    .m-qr-desc{font-size:12px;color:var(--muted);text-align:center;}
+
+    .m-cta{display:flex;gap:10px;width:100%;animation:fadeUp .7s .6s ease both;}
+    .m-cta .btn{flex:1;}
+    .m-footer{margin-top:36px;font-size:11px;color:var(--muted);letter-spacing:0.04em;text-align:center;}
+    .m-footer span{color:var(--gold);}
+
+    /* =============== PC (>= 900px) =============== */
+    @media (min-width: 900px) {
+      .mobile-layout { display: none; }
+      .pc-layout {
+        display:flex; flex-direction:column;
+        width:100%; min-height:100vh;
+        position:relative; z-index:1;
+      }
+
+      .pc-header{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:66px;background:rgba(11,24,38,0.88);border-bottom:1px solid rgba(201,168,76,0.15);backdrop-filter:blur(14px);position:sticky;top:3px;z-index:100;animation:fadeDown .5s ease both;}
+      .pc-header-left{display:flex;align-items:center;gap:14px;}
+      .pc-header-badge{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--navy-mid),var(--navy-light));border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;}
+      .pc-header-brand{display:flex;flex-direction:column;gap:1px;}
+      .pc-header-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+      .pc-header-sub{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
+      .pc-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+      .pc-header-time{font-size:28px;font-weight:300;letter-spacing:0.08em;line-height:1;}
+      .pc-header-time span{color:var(--gold);animation:blink 1s step-start infinite;}
+      .pc-header-date{font-size:11px;color:var(--muted);letter-spacing:0.05em;}
+
+      .pc-main{flex:1;padding:40px 48px 44px;animation:fadeUp .6s .1s ease both;}
+      .pc-page-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:6px;}
+      .pc-page-sub{font-size:13px;color:var(--muted);margin-bottom:36px;}
+
+      .pc-section-label{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+
+      .pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin-bottom:36px;}
+
+      .pc-card{background:rgba(17,34,54,0.6);border:1px solid rgba(201,168,76,0.14);border-radius:16px;padding:24px 20px;text-decoration:none;color:var(--white);display:flex;flex-direction:column;gap:14px;backdrop-filter:blur(8px);transition:all .25s ease;position:relative;overflow:hidden;cursor:pointer;}
+      .pc-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.06),transparent);opacity:0;transition:opacity .25s;}
+      .pc-card:hover{border-color:rgba(201,168,76,0.45);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.35);}
+      .pc-card:hover::before{opacity:1;}
+      .pc-card.highlight{border-color:rgba(201,168,76,0.3);}
+      .pc-card-icon{width:46px;height:46px;border-radius:12px;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.22);display:flex;align-items:center;justify-content:center;font-size:22px;}
+      .pc-card.highlight .pc-card-icon{background:rgba(201,168,76,0.2);border-color:rgba(201,168,76,0.4);}
+      .pc-card-name{font-size:15px;font-weight:600;}
+      .pc-card-url{font-size:11px;color:var(--muted);margin-top:2px;}
+      .pc-card-arrow{color:var(--gold);font-size:18px;margin-top:auto;opacity:0.5;transition:opacity .25s,transform .25s;}
+      .pc-card:hover .pc-card-arrow{opacity:1;transform:translateX(4px);}
+
+      .pc-bottom{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+
+      .pc-qr-box{background:rgba(17,34,54,0.5);border:1px solid rgba(201,168,76,0.18);border-radius:18px;padding:28px 24px;display:flex;align-items:center;gap:24px;backdrop-filter:blur(10px);position:relative;overflow:hidden;}
+      .pc-qr-box::before{content:'';position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:160px;height:160px;background:radial-gradient(circle,rgba(201,168,76,0.08) 0%,transparent 70%);pointer-events:none;}
+      .pc-qr-box .qr-inner{width:110px;height:110px;flex-shrink:0;}
+      .pc-qr-info{display:flex;flex-direction:column;gap:6px;}
+      .pc-qr-label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+      .pc-qr-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;line-height:1.3;}
+      .pc-qr-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+      .pc-action-box{background:rgba(17,34,54,0.5);border:1px solid rgba(201,168,76,0.18);border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:12px;backdrop-filter:blur(10px);}
+      .pc-action-label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+      .pc-action-box .btn{width:100%;text-align:center;}
+
+      .pc-footer{padding:16px 48px;border-top:1px solid rgba(201,168,76,0.1);font-size:11px;color:var(--muted);letter-spacing:0.04em;display:flex;justify-content:space-between;align-items:center;}
+      .pc-footer span{color:var(--gold);}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== PC LAYOUT ===== -->
+  <div class="pc-layout">
+    <header class="pc-header">
+      <div class="pc-header-left">
+        <div class="pc-header-badge">🦁</div>
+        <div class="pc-header-brand">
+          <div class="pc-header-title">Tabocide PGI</div>
+          <div class="pc-header-sub">Pusat Gadai Indonesia</div>
+        </div>
+      </div>
+      <div class="pc-header-right">
+        <div class="pc-header-time" id="pc-time"></div>
+        <div class="pc-header-date" id="pc-date"></div>
+      </div>
+    </header>
+
+    <main class="pc-main">
+      <div class="pc-page-title">Dashboard Operasional</div>
+      <div class="pc-page-sub">Akses cepat tools dan sistem layanan — Unit CMS006</div>
+
+      <div class="pc-section-label">TOOLS &amp; LAYANAN</div>
+      <div class="pc-grid">
+        <a href="https://gadai.pugindo.com/dashboard" target="_blank" class="pc-card">
+          <div class="pc-card-icon">🌐</div>
+          <div><div class="pc-card-name">PUGINDO</div><div class="pc-card-url">gadai.pugindo.com</div></div>
+          <div class="pc-card-arrow">›</div>
+        </a>
+        <a href="https://gadai.pugindo.com/gadai/simulasi" target="_blank" class="pc-card">
+          <div class="pc-card-icon">🧮</div>
+          <div><div class="pc-card-name">Simulasi Gadai</div><div class="pc-card-url">gadai.pugindo.com/simulasi</div></div>
+          <div class="pc-card-arrow">›</div>
+        </a>
+        <a href="https://www.imei.info/id/" target="_blank" class="pc-card">
+          <div class="pc-card-icon">📱</div>
+          <div><div class="pc-card-name">IMEI Check</div><div class="pc-card-url">imei.info</div></div>
+          <div class="pc-card-arrow">›</div>
+        </a>
+        <a href="https://survey.pusatgadai.id/?cabang=CMS006#step-1" target="_blank" class="pc-card highlight">
+          <div class="pc-card-icon">📌</div>
+          <div><div class="pc-card-name">Survey</div><div class="pc-card-url">survey.pusatgadai.id</div></div>
+          <div class="pc-card-arrow">›</div>
+        </a>
+        <a href="https://www.tiktok.com/@lexy6893?is_from_webapp=1&sender_device=pc" target="_blank" class="pc-card">
+          <div class="pc-card-icon">🎵</div>
+          <div><div class="pc-card-name">Follow TikTok</div><div class="pc-card-url">tiktok.com/@lexy6893</div></div>
+          <div class="pc-card-arrow">›</div>
+        </a>
+      </div>
+
+      <div class="pc-bottom">
+        <div class="pc-qr-box">
+          <div class="qr-frame">
+            <div class="qr-inner">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://survey.pusatgadai.id/?cabang=CMS006%23step-1" alt="QR Survey"/>
+            </div>
+          </div>
+          <div class="pc-qr-info">
+            <div class="pc-qr-label">📲 Scan untuk Akses</div>
+            <div class="pc-qr-title">Survei Kepuasan Pelanggan</div>
+            <div class="pc-qr-desc">Scan QR untuk mengakses formulir survei unit CMS006</div>
+          </div>
+        </div>
+        <div class="pc-action-box">
+          <div class="pc-action-label">Aksi Cepat</div>
+          <button class="btn btn-primary" onclick="window.open('https://survey.pusatgadai.id/?cabang=CMS006#step-1','_blank')">📌 &nbsp;Buka Survey Langsung</button>
+          <button class="btn btn-secondary" onclick="window.open('https://gadai.pugindo.com/gadai/simulasi','_blank')">🧮 &nbsp;Simulasi / Input Data</button>
+          <button class="btn btn-secondary" onclick="window.open('https://gadai.pugindo.com/dashboard','_blank')">🌐 &nbsp;Buka Dashboard PUGINDO</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="pc-footer">
+      <div>&copy; 2026 <span>Tabocide PGI</span> · Pusat Gadai Indonesia</div>
+      <div>Unit <span>CMS006</span></div>
+    </footer>
+  </div>
+
+  <!-- ===== MOBILE LAYOUT ===== -->
+  <div class="mobile-layout">
+    <div class="m-brand">
+      <div class="m-brand-badge">🦁</div>
+      <div class="m-brand-title">Tabocide PGI</div>
+      <div class="m-brand-sub">Pusat Gadai Indonesia</div>
+    </div>
+
+    <div class="m-divider"></div>
+
+    <div class="m-datetime">
+      <div class="m-dt-left">
+        <div class="m-dt-day" id="m-day"></div>
+        <div class="m-dt-date" id="m-date"></div>
+      </div>
+      <div class="m-dt-time" id="m-time"></div>
+    </div>
+
+    <p class="m-section-label">Layanan Utama</p>
+    <div class="m-nav-links">
+      <a href="https://gadai.pugindo.com/dashboard" target="_blank" class="nav-link">
+        <div class="nav-icon">🌐</div>
+        <div class="nav-link-text"><span class="nav-link-title">PUGINDO</span><span class="nav-link-desc">Portal Utama Gadai Indonesia</span></div>
+        <span class="nav-arrow">›</span>
+      </a>
+      <a href="https://www.imei.info/id/" target="_blank" class="nav-link">
+        <div class="nav-icon">📱</div>
+        <div class="nav-link-text"><span class="nav-link-title">IMEI Check</span><span class="nav-link-desc">Verifikasi nomor IMEI perangkat</span></div>
+        <span class="nav-arrow">›</span>
+      </a>
+      <a href="https://www.tiktok.com/@lexy6893?is_from_webapp=1&sender_device=pc" target="_blank" class="nav-link">
+        <div class="nav-icon">🎵</div>
+        <div class="nav-link-text"><span class="nav-link-title">Follow TikTok</span><span class="nav-link-desc">Update konten terbaru kami</span></div>
+        <span class="nav-arrow">›</span>
+      </a>
+      <a href="https://survey.pusatgadai.id/?cabang=CMS006#step-1" target="_blank" class="nav-link" style="border-color:rgba(201,168,76,0.3);">
+        <div class="nav-icon" style="background:rgba(201,168,76,0.2);">📌</div>
+        <div class="nav-link-text"><span class="nav-link-title">SURVEY</span><span class="nav-link-desc">Berikan penilaian layanan kami</span></div>
+        <span class="nav-arrow" style="opacity:1;">›</span>
+      </a>
+    </div>
+
+    <div class="m-qr-section">
+      <div class="m-qr-label">📲 Scan untuk Akses Langsung</div>
+      <div class="qr-frame">
+        <div class="qr-inner">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://survey.pusatgadai.id/?cabang=CMS006%23step-1" alt="QR Survey"/>
+        </div>
+      </div>
+      <div class="m-qr-title">Survei Kepuasan Pelanggan</div>
+      <div class="m-qr-desc">Scan QR di atas untuk mengakses formulir survei unit CMS006</div>
+    </div>
+
+    <div class="m-cta">
+      <button class="btn btn-primary" onclick="window.open('https://survey.pusatgadai.id/?cabang=CMS006#step-1','_blank')">Akses Langsung</button>
+      <button class="btn btn-secondary" onclick="window.open('https://gadai.pugindo.com/gadai/simulasi','_blank')">Simulasi / Input</button>
+    </div>
+
+    <div class="m-footer">&copy; 2026 <span>Tabocide PGI</span> · Pusat Gadai Indonesia</div>
+  </div>
+
+  <script>
+    const days   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    function pad(n){ return String(n).padStart(2,'0'); }
+
+    function updateTime(){
+      const now = new Date();
+      const h=pad(now.getHours()), m=pad(now.getMinutes()), s=pad(now.getSeconds());
+      const timeHTML = `${h}<span>:</span>${m}<span>:</span>${s}`;
+      const dayStr  = days[now.getDay()];
+      const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      const dateShort = `${dayStr}, ${now.getDate()} ${months[now.getMonth()].slice(0,3)} ${now.getFullYear()}`;
+
+      const md=document.getElementById('m-day');
+      const mdate=document.getElementById('m-date');
+      const mt=document.getElementById('m-time');
+      if(md) md.textContent=dayStr;
+      if(mdate) mdate.textContent=dateStr;
+      if(mt) mt.innerHTML=timeHTML;
+
+      const pt=document.getElementById('pc-time');
+      const pd=document.getElementById('pc-date');
+      if(pt) pt.innerHTML=timeHTML;
+      if(pd) pd.textContent=dateShort;
+    }
+    updateTime();
+    setInterval(updateTime,1000);
+  </script>
+</body>
+</html>
